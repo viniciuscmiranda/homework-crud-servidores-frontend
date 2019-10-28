@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import api from '../../services/api';
 import {SyncLoader} from 'react-spinners'
 import {Link} from 'react-router-dom';
-import {TableLayout, TableHeader} from '../../styles/tableStyles';
+import {TableLayout, TableHeader, TableContainer} from '../../styles/tableStyles';
 import {Title, NewButton, NoConnection, Loader} from '../../styles/styles';
 import TableContent from './TableContent';
 
@@ -12,14 +12,17 @@ export default class ClientList extends Component {
     state = {
         clientsFromDatabase: [],
         loading: true,
-        connection: true
+        connection: false
     };
 
     async componentDidMount() {
         try {
             // Get clients from server
-            const data = await api.get('/clients');
-            this.setState({clientsFromDatabase: data.data, loading: false, connection: true});
+            const data = await api.get('/getClients.php');
+            let clis = data.data;
+            clis.map(c=>c);
+
+            this.setState({clientsFromDatabase: clis, loading: false, connection: true});
         } catch {
             this.setState({loading: false, connection: false});
         }
@@ -27,7 +30,7 @@ export default class ClientList extends Component {
 
     //Delete client from database
     deleteClientHandler = async id => {
-        api.delete(`/clients/${id}`);
+        api.get(`/deleteClient.php?id=${id}`);
         //Remove from table
         const item = document.getElementById(id);
         item.parentNode.removeChild(item);
@@ -41,7 +44,7 @@ export default class ClientList extends Component {
                 <Title>Clientes</Title>
 
                 {/* Connection Error */}
-                {!connection && (<NoConnection/>)}
+                {!connection && !loading && (<NoConnection/>)}
                 
                 {/* While Loading */}
                 {loading && (<Loader><SyncLoader/></Loader>)}
@@ -49,6 +52,7 @@ export default class ClientList extends Component {
                 {/* If connected and not Loading */}
                 {(connection && !loading) && (
                     // Render Table
+                    <TableContainer>
                     <TableLayout>
                         <table>
                             <thead>
@@ -63,6 +67,7 @@ export default class ClientList extends Component {
                             <TableContent clients={clientsFromDatabase} onDelete={this.deleteClientHandler}/>
                         </table>
                     </TableLayout>
+                    </TableContainer>
                 )}
 
                 {/*  Go to new client */}

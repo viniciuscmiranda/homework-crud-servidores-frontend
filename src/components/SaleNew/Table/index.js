@@ -48,7 +48,7 @@ export default class Table extends Component {
                                         <input 
                                         className="prodPrice"
                                         id={`${prod._id}-price`}
-                                        defaultValue={prod.price.toFixed(2)}
+                                        defaultValue={parseFloat(prod.price).toFixed(2)}
                                         onChange={(e) => {
                                             this.setRentabiliy(prod.price, prod._id);
                                             setTotalPrice();

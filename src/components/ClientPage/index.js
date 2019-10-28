@@ -20,7 +20,7 @@ export default class ClientPage extends Component{
         const { match: { params } } = this.props;
         try{
             // Get client data
-            const cli = await api.get(`/clients/${params.id}`);
+            const cli = await api.get(`/getClientById.php?id=${params.id}`);
             this.setState({loading: false, cli: cli.data});
         } catch (e){
             this.setState({loading: false, connection: false});

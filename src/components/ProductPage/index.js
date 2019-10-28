@@ -18,7 +18,7 @@ export default class ProductPage extends Component{
         const { match: { params } } = this.props;
         try{
             // Get product data
-            const prod = await api.get(`/products/${params.id}`);
+            const prod = await api.get(`/getProductById.php?id=${params.id}`);
             this.setState({loading: false, prod: prod.data});
         } catch (e){
             this.setState({loading: false, connection: false});

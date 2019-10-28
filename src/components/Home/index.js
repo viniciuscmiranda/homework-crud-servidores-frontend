@@ -5,7 +5,6 @@ import {Link} from 'react-router-dom';
 import {NoConnection, Loader} from '../../styles/styles';
 import api from '../../services/api';
 import {SyncLoader} from 'react-spinners';
-import Logo from '../Logo/index';
 
 
 export default class Home extends Component{
@@ -20,14 +19,29 @@ export default class Home extends Component{
     
     async componentDidMount() {
         try{
-            const cli = await api.get('/clients');
-            const prod = await api.get('/products');
-            const sale = await api.get('/sales');
+            let cli = await api.get('/getClients.php');            
+            let prod = await api.get('/getProducts.php');
+            let sale = await api.get('/getSales.php');   
+            
+            try {
+                cli.data.map(c=>c);
+                cli = cli.data.length;
+            } catch {cli = 0;}
+
+            try {
+                prod.data.map(p=>p);
+                prod = prod.data.length;
+            } catch {prod = 0;} 
+
+            try {
+                sale.data.map(s=>s);
+                sale = sale.data.length;
+            } catch {sale = 0;}
 
             this.setState({
-                cli: Object.keys(cli.data).length,
-                prod: Object.keys(prod.data).length,
-                sale: Object.keys(sale.data).length,
+                cli,
+                prod,
+                sale,
 
                 loading: false,
                 connection: true
@@ -43,7 +57,6 @@ export default class Home extends Component{
 
         return (
           <Main>
-            <Logo/>
 
             {/* Connection error */}
             {!connection && (<NoConnection/>)}

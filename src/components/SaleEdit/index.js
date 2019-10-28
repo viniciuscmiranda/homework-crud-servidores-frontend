@@ -28,28 +28,44 @@ export default class NewSale extends Component {
         const { match: { params } } = this.props;
 
         try {
-            let saleHolder = await api.get(`/sales/${params.id}`);
-            const clients = await api.get('/clients');
-            const productsData = await api.get('/products');
+            let saleHolder = await api.get(`/getSaleById.php?id=${params.id}`);
+            const clients = await api.get('/getClients.php');
+            const productsData = await api.get('/getProducts.php');
 
             let cart = [];
             saleHolder = saleHolder.data;
 
-            saleHolder.products.map(async prod => {
+            saleHolder.products.map(async prod => {    
                 const refProd = productsData.data.find(p => {return p._id === prod.productId});
-                let newProduct = {
-                    id: prod.productId,
-                    name: refProd.name,
-                    price: refProd.price,
-                    newPrice: prod.price,
-                    rentability: getRentability(refProd.price, prod.price),
-                    amount: prod.amount,
-                    multiple: refProd.multiple
-                };
+                
+                let newProduct
+                if(refProd===undefined) {
+                    newProduct = {
+                        id: prod.productId,
+                        name: "",
+                        price: "",
+                        newPrice: prod.price,
+                        rentability: getRentability("0.0", prod.price),
+                        amount: prod.amount,
+                        multiple: ""
+                    };
+                } else {
+                    newProduct = {
+                        id: prod.productId,
+                        name: refProd.name,
+                        price: refProd.price,
+                        newPrice: prod.price,
+                        rentability: getRentability(refProd.price, prod.price),
+                        amount: prod.amount,
+                        multiple: refProd.multiple
+                    };
+                    
+                }
                 
                 cart.push(newProduct);
             });
 
+            
             
             let products = [];
             await productsData.data.map(prod => {
@@ -65,8 +81,7 @@ export default class NewSale extends Component {
                 
                 products.push(newProduct);
                 return true;
-            });         
-            
+            });                     
 
             this.setState({
                 id: params.id,
@@ -81,8 +96,10 @@ export default class NewSale extends Component {
             if (!this.state.clients.length || !this.state.products.length) this.setState({connection: false});
             else this.calcTotalPrice();
         }
-        catch {
+        catch(e) {
             this.setState({connection: false, loading: false});
+            console.log(e);
+            
         }
     }
 
@@ -127,18 +144,21 @@ export default class NewSale extends Component {
             newPrice += amountItem.value * priceHolder[index].value;
             //Find original price for this product
             let prodPrice = this.state.cart.find(p => {
-                return p.id === amountItem.parentElement.parentElement.id
+                
+                return p.id === amountItem.parentElement.parentElement.id;
+
             });
+
             //Set original price multiplied by amount
-            originalPrice += prodPrice.price * amountItem.value;
+            if(prodPrice!==undefined) originalPrice += prodPrice.price * amountItem.value;
         });
 
         //Set total price input, and apply mask
         document.getElementById("total-price").value = 
-        "$" + newPrice.toFixed(2).toString().replace('.', ',');
+        "$" + parseFloat(newPrice).toFixed(2).toString().replace('.', ',');
         //Set original price iput, and apply mask
         document.getElementById("diff-price").value =
-         "$" + originalPrice.toFixed(2).toString().replace('.', ',');
+         "$" + parseFloat(originalPrice).toFixed(2).toString().replace('.', ',');
 
         //Get rentability input 
         const rentInput = document.getElementById('rent-price');
@@ -230,7 +250,7 @@ export default class NewSale extends Component {
         //Submit data
         try {
             //Make request
-            await api.post(`/sales/${this.state.id}`, {clientId, products});
+            await api.post(`/updateSale.php`, JSON.stringify({id: this.state.id, clientId, products}));
             this.setState({success: true});
         } catch (e) {
             //Show error message

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import api from '../../services/api';
 import {Link} from 'react-router-dom';
 import {SyncLoader} from 'react-spinners'
-import {TableLayout, TableHeader} from '../../styles/tableStyles';
+import {TableLayout, TableHeader, TableContainer} from '../../styles/tableStyles';
 import {Title, NewButton, NoConnection, Loader} from '../../styles/styles';
 import TableContent from './TableContent';
 
@@ -17,11 +17,11 @@ export default class SaleList extends Component {
     async componentDidMount() {
         // Get Sales from database
         try {
-            const data = await api.get('/sales');
+            const data = await api.get('/getSales.php');
             const newData = await this.setClientNames(data.data);
             this.setState({salesFromDatabase: newData, loading: false, connection: true});
-        } catch {
-            this.setState({loading: false, connection: false});
+        } catch(e) {
+            this.setState({loading: false, connection: false});            
         }
     };
 
@@ -29,7 +29,7 @@ export default class SaleList extends Component {
     setClientNames = async sales => {
         // If client match client id from sale, get name
         const prom = sales.map(async sale => {
-            const c = await api.get(`/clients/${sale.clientId}`);
+            const c = await api.get(`/getClientById.php?id=${sale.clientId}`);
             if (c.data !== null) sale.clientName = c.data.name;
             else sale.clientName = "Not Found";
             }
@@ -41,7 +41,7 @@ export default class SaleList extends Component {
 
     //Delete sale from database
     deleteSaleHandler = async id => {
-        api.delete(`/sales/${id}`);
+        api.get(`/deleteSale.php?id=${id}`);
         // Remove from table
         const item = document.getElementById(id);
         item.parentNode.removeChild(item);
@@ -63,6 +63,7 @@ export default class SaleList extends Component {
                 {/* If connected and not loading */}
                 {(connection && !loading) && (
                     // Render table
+                    <TableContainer>
                     <TableLayout>
                         <table>
                             <thead>
@@ -79,6 +80,7 @@ export default class SaleList extends Component {
                             <TableContent sales={salesFromDatabase} onDelete={this.deleteSaleHandler}/>
                         </table>
                     </TableLayout>
+                    </TableContainer>
                 )}
 
                 {/* Go to new sale */}

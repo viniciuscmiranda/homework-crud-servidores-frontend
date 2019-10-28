@@ -43,3 +43,13 @@ export const TableAction = styled.td `
         }
     }
 `
+
+export const TableContainer = styled.div `
+    width: 100%;
+    overflow-x: auto;
+
+    table{
+        min-width: 300px;
+        table-layout: fixed;
+    }
+`;

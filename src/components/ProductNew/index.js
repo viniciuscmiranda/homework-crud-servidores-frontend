@@ -40,12 +40,12 @@ export default class ProductNew extends Component {
         this.setState({loading: true});
 
         //Send data to api
-        api.post('/newproduct', {
+        api.post('/createProduct.php', JSON.stringify({
             name: e.target.name.value,
             price: parseFloat(e.target.price.value),
             multiple: parseInt(e.target.multiple.value),
             picture: e.target.picture.value,
-        }).then((e) => {
+        })).then((e) => {
             this.setState({success: true, loading: false, id: e.data._id});
             // Empty fields           
             document.getElementById("form").reset(); 

@@ -31,14 +31,18 @@ export default class ClientNew extends Component {
         // Set loading state
         this.setState({loading: true});
 
+
         //Send data to api
-        api.post('/newclient', {name: e.target.name.value, picture: e.target.picture.value})
+        api.post('/createClient.php', JSON.stringify({name: e.target.name.value, picture: e.target.picture.value}))
             .then((e) => {       
+                console.log(e);
+                
                 this.setState({success: true, loading: false, id: e.data._id});
                 // Empty fields
                 document.getElementById("form").reset(); 
             }, (e) => {
                 // Catch
+                
                 this.setState({connection: false, loading: false});
             });
     }

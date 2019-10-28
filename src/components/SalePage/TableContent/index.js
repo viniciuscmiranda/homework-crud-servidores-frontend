@@ -4,6 +4,7 @@ import {TableData} from "../../../styles/tableStyles";
 import {getStringFloat, getRentability} from '../../../rules';
 import api from "../../../services/api";
 import { LinkStyled } from "../../../styles/styles";
+import {uniqueId} from 'lodash';
 
 class TableContent extends Component {
     state = {
@@ -18,7 +19,7 @@ class TableContent extends Component {
         const prodHolder = this.props.products;
         let products = [];
         const promise = await prodHolder.map(async prod => {
-            const p = await api.get(`/products/${prod.productId}`);
+            const p = await api.get(`/getProductById.php?id=${prod.productId}`);
             products.push({
                 id: p.data._id,
                 name: p.data.name,
@@ -40,7 +41,7 @@ class TableContent extends Component {
             <tbody>
                 {products.map(prod => {
                     return(
-                        <tr key={prod.id}>
+                        <tr key={uniqueId()}>
                             <TableData><LinkStyled to={`/products/${prod.id}`}>{prod.name}</LinkStyled></TableData>
                             <TableData>{getStringFloat(prod.price)}</TableData>
                             <TableData>{getStringFloat(prod.newPrice)}</TableData>

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import api from '../../services/api';
 import {Link} from 'react-router-dom';
 import {SyncLoader} from 'react-spinners'
-import {TableLayout, TableHeader} from '../../styles/tableStyles';
+import {TableLayout, TableHeader, TableContainer} from '../../styles/tableStyles';
 import {Title, NewButton, NoConnection, Loader} from '../../styles/styles';
 import TableContent from './TableContent';
 
@@ -11,14 +11,18 @@ export default class ProductList extends Component {
     state = {
         productsFromDatabase: [],
         loading: true,
-        connection: true
+        connection: false
     };
 
     // Get prodcuts from api
     async componentDidMount() {
         try {
-            const data = await api.get('/products');
-            this.setState({productsFromDatabase: data.data, loading: false, connection: true});
+            const data = await api.get('/getProducts.php');
+            let prods = data.data;
+            prods.map(p=>p);
+
+            
+            this.setState({productsFromDatabase: prods, loading: false, connection: true});
         } catch {
             this.setState({loading: false, connection: false});
         }
@@ -26,7 +30,7 @@ export default class ProductList extends Component {
 
     //Delete product from database
     deleteProductHandler = async id => {
-        api.delete(`/products/${id}`);
+        api.get(`/deleteProduct.php?id=${id}`);
         //Remove from table
         const item = document.getElementById(id);
         item.parentNode.removeChild(item);
@@ -40,13 +44,14 @@ export default class ProductList extends Component {
                 <Title>Produtos</Title>
 
                 {/* Connection error */}
-                {!connection && (<NoConnection/>)}
+                {!connection && !loading && (<NoConnection/>)}
                 {/* While loading */}
                 {loading && (<Loader><SyncLoader/></Loader>)}
 
                 {/* If connected and not loading */}
                 {(connection && !loading) && (
                     // Render Table
+                    <TableContainer>
                     <TableLayout>
                     <table>
                         <thead>
@@ -63,6 +68,7 @@ export default class ProductList extends Component {
                         <TableContent products={productsFromDatabase} onDelete={this.deleteProductHandler}/>
                     </table>
                     </TableLayout>
+                    </TableContainer>
                 )}
 
                 {/* Go to new product */}

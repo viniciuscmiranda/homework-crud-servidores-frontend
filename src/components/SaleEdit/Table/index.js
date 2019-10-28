@@ -4,6 +4,7 @@ import {TableContainer} from '../../SaleNew/Table/styles';
 import {MdDelete} from 'react-icons/md';
 import {ButtonDelete} from '../../../styles/styles';
 import { getRentability, getStringFloat } from '../../../rules';
+import {uniqueId} from 'lodash';
 
 export default class Table extends Component {
     // Set rentability for each item
@@ -41,7 +42,7 @@ export default class Table extends Component {
                         {cart.map((prod) => {
                             
                             return (
-                                <tr key={prod.id} id={prod.id}>
+                                <tr key={uniqueId()} id={prod.id}>
                                     <TableData>{prod.name}</TableData>
                                     <TableData>{getStringFloat(prod.price)}</TableData>
                                     <TableData>
@@ -49,7 +50,7 @@ export default class Table extends Component {
                                         <input 
                                         className="prodPrice"
                                         id={`${prod.id}-price`}
-                                        defaultValue={prod.newPrice.toFixed(2)}
+                                        defaultValue={parseFloat(prod.newPrice).toFixed(2)}
                                         onChange={(e) => {
                                             this.setRentabiliy(prod.price, prod.id);
                                             setTotalPrice();

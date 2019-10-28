@@ -14,7 +14,7 @@ export default class NewSale extends Component {
         clients: [],
         products: [],
         cart: [],
-        connection: true,
+        connection: false,
         loading: true,
         success: false,
         lowrent: false,
@@ -46,10 +46,10 @@ export default class NewSale extends Component {
 
         //Set total price input, and apply mask
         document.getElementById("total-price").value = 
-        "$" + newPrice.toFixed(2).toString().replace('.', ',');
+        "$" + parseFloat(newPrice).toFixed(2).toString().replace('.', ',');
         //Set original price iput, and apply mask
         document.getElementById("diff-price").value =
-         "$" + originalPrice.toFixed(2).toString().replace('.', ',');
+         "$" + parseFloat(originalPrice).toFixed(2).toString().replace('.', ',');
 
         //Get rentability input 
         const rentInput = document.getElementById('rent-price');
@@ -163,7 +163,7 @@ export default class NewSale extends Component {
         //Submit data
         try {
             //Make request
-            const e = await api.post('/newsale', {clientId, products});
+            const e = await api.post('/createSale.php', JSON.stringify({clientId, products}));
             
             this.setState({success: true, cart: [], id: e.data._id});
         } catch (e) {
@@ -176,18 +176,20 @@ export default class NewSale extends Component {
     }
 
     //Get clients and products from api
-    async componentDidMount() {
+    async componentWillMount() {
         try {
-            const clients = await api.get('/clients');
-            const products = await api.get('/products');
+            const clients = await api.get('/getClients.php');
+            const products = await api.get('/getProducts.php');  
+            
+            let clis = clients.data;
+            clis.map(c=>c);
+            let prods = products.data;
+            prods.map(p=>p);
 
-            this.setState({clients: clients.data, products: products.data, loading: false});
-
-            if (!Object.keys(clients.data).length || !Object.keys(products.data).length) 
-                this.setState({connection: false});
-            }
-        catch {
+            this.setState({clients: clis, products: prods, loading: false, connection: true});
+        } catch (e){
             this.setState({connection: false, loading: false});
+            
         }
     }
 
@@ -207,7 +209,7 @@ export default class NewSale extends Component {
                 <Title>Nova Venda</Title>
 
                 {/* Connection Error */}
-                {!connection && (<NoConnection/>)}
+                {!connection && !loading && (<NoConnection/>)}
 
                 {/* While Loading */}
                 {loading && ( <Loader><SyncLoader/></Loader>)}
@@ -223,7 +225,8 @@ export default class NewSale extends Component {
                 {lowrent && (<CustomError><span>Um ou mais produtos com baixa rentabilidade!</span></CustomError>)}
 
                 {/* If could get data from database */}
-                {(connection && !!products.length && !!clients.length && (
+                {((connection && !!products.length && !!clients.length) && (
+                    
                     <form onSubmit={this.handleSubmit}>
                         <LabelItem>
                             <span>Cliente</span>

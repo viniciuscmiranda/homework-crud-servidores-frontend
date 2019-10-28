@@ -21,7 +21,7 @@ export default class ProductEdit extends Component {
         //Get client data
         const { match: { params } } = this.props;
         try{   
-            const prod = await api.get(`/products/${params.id}`);
+            const prod = await api.get(`/getProductById.php?id=${params.id}`);
             this.setState({prod: prod.data, loading: false, getting: false});    
         } catch{
             this.setState({loading: false, connection: false, getting: false});    
@@ -45,12 +45,13 @@ export default class ProductEdit extends Component {
         this.setState({loading: true});
 
         //Send data to api
-        api.post(`/products/${this.state.prod._id}`, {
+        api.post(`/updateProduct.php`, JSON.stringify({
+            id: this.state.prod._id,
             name: e.target.name.value,
             price: parseFloat(e.target.price.value),
             multiple: parseInt(e.target.multiple.value),
             picture: e.target.picture.value,
-        })
+        }))
             .then((res) => {       
                 this.setState({success: true, loading: false});
                 //Empty fields

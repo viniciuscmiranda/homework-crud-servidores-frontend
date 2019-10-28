@@ -21,7 +21,7 @@ export default class ClientEdit extends Component {
         //Get client data
         const { match: { params } } = this.props;
         try{   
-            const cli = await api.get(`/clients/${params.id}`);
+            const cli = await api.get(`/getClientById.php?id=${params.id}`);
             this.setState({cli: cli.data, loading: false, getting: false});    
         } catch{
             this.setState({loading: false, connection: false, getting: false});    
@@ -45,13 +45,15 @@ export default class ClientEdit extends Component {
         this.setState({loading: true});
 
         //Send data to api
-        api.post(`/clients/${this.state.cli._id}`, {name: e.target.name.value, picture: e.target.picture.value})
+        api.post(`/updateClient.php`, JSON.stringify({id: this.state.cli._id,name: e.target.name.value, picture: e.target.picture.value}))
             .then((res) => {       
                 this.setState({success: true, loading: false});
                 //Empty fields
                 document.getElementById("form").reset(); 
                 //Set new data
                this.setState({cli: res.data});
+               console.log(res);
+               
             }, (e) => {
                 // Catch
                 this.setState({connection: false, loading: false});

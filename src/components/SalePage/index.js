@@ -21,9 +21,9 @@ export default class SalePage extends Component{
         const { match: { params } } = this.props;
         try{
             //Get Sale Data
-            const sale = await api.get(`/sales/${params.id}`);
+            const sale = await api.get(`/getSaleById.php?id=${params.id}`);
             //Get Client Name
-            const client = await api.get(`/clients/${sale.data.clientId}`);
+            const client = await api.get(`/getClientById.php?id=${sale.data.clientId}`);
             this.setState({loading: false, sale: sale.data, clientName: client.data.name});
         } catch (e){
             this.setState({loading: false, connection: false});
@@ -105,17 +105,19 @@ export default class SalePage extends Component{
                     {/* Products table */}
                     <Title>Produtos</Title>
                     <TableLayout>
-                        <thead>
-                            <tr>
-                                <TableHeader>Nome</TableHeader>
-                                <TableHeader>Sugerido</TableHeader>
-                                <TableHeader>Preço</TableHeader>
-                                <TableHeader>Quantidade</TableHeader>
-                                <TableHeader>Rentabilidade</TableHeader>
-                            </tr>
-                        </thead>
-                        {/* Table Content */}
-                        <TableContent products={sale.products}/>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <TableHeader>Nome</TableHeader>
+                                    <TableHeader>Sugerido</TableHeader>
+                                    <TableHeader>Preço</TableHeader>
+                                    <TableHeader>Quantidade</TableHeader>
+                                    <TableHeader>Rentabilidade</TableHeader>
+                                </tr>
+                            </thead>
+                            {/* Table Content */}
+                            <TableContent products={sale.products}/>
+                        </table>
                     </TableLayout>
                  </div>
                 )}
